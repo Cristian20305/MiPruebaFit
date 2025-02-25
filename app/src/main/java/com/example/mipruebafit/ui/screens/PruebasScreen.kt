@@ -8,12 +8,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.mipruebafit.Data.model.Prueba
+import com.example.mipruebafit.Data.repository.PruebasRepository
+import com.example.mipruebafit.R
+import com.example.mipruebafit.ui.components.PruebaItem
 
 @Composable
 fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
     // Lista de pruebas que se mostraran en la pantalla depende de la edad
-    val pruebas = obtenerPruebasPorEdad(edadUsuario)
+    val pruebas = PruebasRepository.obtenerPruebasPorEdad(edadUsuario)
 
     // Organizmao de manera vertical
     Column(
@@ -25,7 +29,7 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
         Spacer(modifier = Modifier.height(50.dp))
 
         Text(
-            text = "Lista de Pruebas para esta edad $edadUsuario",
+            text = "Lista de Pruebas para esta edad $edadUsuario años",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -34,42 +38,9 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
         LazyColumn {
             // Iteramos sobre cada uno para que nos lo muestre desde una lista
             items(pruebas) { prueba ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable { pruebaSelected(prueba) } // Llama a la funcion onPruebaSelected pasando la prueba seleccionada
-                ) {
-                    Text(
-                        text = prueba,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                PruebaItem(prueba, pruebaSelected)
             }
         }
     }
 }
 
-// Para determinar que pruebas mostrar segun la edad del excel <=12 , 13, 14, 15, >=16
-fun obtenerPruebasPorEdad(edad: Int): List<String> {
-    return when {
-        edad <= 12 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper")
-        edad == 13 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper")
-        edad == 14 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper", "Velocidad")
-        edad == 15 -> listOf(
-            "Abdominales",
-            "Flexibilidad",
-            "Test de Cooper",
-            "Velocidad",
-            "Lanzamiento Balón"
-        )
-
-        else -> listOf(
-            "Abdominales",
-            "Flexibilidad",
-            "Test de Cooper",
-            "Velocidad",
-            "Lanzamiento Balón"
-        ) // Para 16 o más
-    }
-}
