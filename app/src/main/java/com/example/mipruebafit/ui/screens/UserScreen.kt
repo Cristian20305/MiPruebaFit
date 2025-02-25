@@ -11,13 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
-//Pantalla de usuario para ingresar los datos de esa persona como edas, poeso, altura y genero
-
 @Composable
 fun UserScreen(function: () -> Unit) {
 
     // Variables de estado para almacenar la edad, peso y altura del usuario.
-
     var edad by rememberSaveable { mutableStateOf("") }
     var peso by rememberSaveable { mutableStateOf("") }
     var altura by rememberSaveable { mutableStateOf("") }
@@ -26,11 +23,15 @@ fun UserScreen(function: () -> Unit) {
     var masculino by remember { mutableStateOf(true) } // Predeterminado masculino
     var femenino by remember { mutableStateOf(false) }
 
-    // Layout principal en forma de column para organizar elementos de manera vertical
+    // Variables para controlar la visibilidad del dialogo del IMC
+    var showDialog by remember { mutableStateOf(false) }
+    var imcResultado by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), verticalArrangement = Arrangement.Center
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         Text(text = "Datos del Usuario", style = MaterialTheme.typography.headlineMedium)
 
@@ -102,11 +103,55 @@ fun UserScreen(function: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // BOTON para calcular el IMC
         Button(
-            onClick = { function() }, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                val pesoFloat = peso.toFloatOrNull()
+                val alturaFloat = altura.toFloatOrNull()?.div(100) // Convertir cm a metros
+
+                if (pesoFloat != null && alturaFloat != null && alturaFloat > 0) {
+                    val imc = pesoFloat / (alturaFloat * alturaFloat)
+                    val categoria = when {
+                        imc < 18.5 -> "Bajo peso"
+                        imc in 18.5..24.9 -> "Peso normal"
+                        imc in 25.0..29.9 -> "Sobrepeso"
+                        else -> "Obesidad"
+                    }
+                    imcResultado = "Tu IMC es: %.2f\nCategoria: $categoria".format(imc)
+                    showDialog = true
+                } else {
+                    imcResultado = "Por favor, introduce un peso y altura validos."
+                    showDialog = true
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Calcular IMC")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // BOTON para continuar
+        Button(
+            onClick = { function() },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Continuar")
         }
+    }
+
+    // Dialog para mostrar el resultado del IMC
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Resultado del IMC") },
+            text = { Text(imcResultado) },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cerrar")
+                }
+            }
+        )
     }
 }
 
