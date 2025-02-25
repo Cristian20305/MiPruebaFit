@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 //Pantalla de usuario para ingresar los datos de esa persona como edas, poeso, altura y genero.
 //Tambien calculamos el IMC en un dialog
 @Composable
-fun UserScreen(function: () -> Unit) {
+fun UserScreen(onContinue: (Int) -> Unit) {
 
     // Variables de estado para almacenar la edad, peso y altura del usuario.
     var edad by rememberSaveable { mutableStateOf("") }
@@ -135,11 +135,15 @@ fun UserScreen(function: () -> Unit) {
 
         // BOTON para continuar
         Button(
-            onClick = { function() },
+            onClick = {
+                val edadInt = edad.toIntOrNull() ?: 0 // Convertimos la edad a Int
+                onContinue(edadInt) // Pasamos la edad
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Continuar")
         }
+
     }
 
     // Dialog para mostrar el resultado del IMC

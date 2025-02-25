@@ -10,6 +10,6 @@ object LoginScreenRoute
 @Serializable
 object UserScreenRoute
 
-// Ruta para la pantalla de Pruebas
+// Ruta para la pantalla de Pruebas y pasamos la edad a esta desde UserScreenRoute
 @Serializable
-object PruebasScreenRoute
+data class PruebasScreenRoute(val edadUsuario:Int)

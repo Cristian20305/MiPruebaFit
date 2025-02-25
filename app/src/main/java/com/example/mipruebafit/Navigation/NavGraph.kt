@@ -1,6 +1,10 @@
 package com.example.mipruebafit.Navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +18,8 @@ fun NavigationWrapper(modifier: Modifier) {
 
     // Objeto que controla la navegación
     val navController = rememberNavController()
+    var edadUsuario by rememberSaveable { mutableStateOf(0) }
+
 
     // NavHost con la ruta de inicio definida como LoginScreenRoute
     NavHost(
@@ -28,16 +34,17 @@ fun NavigationWrapper(modifier: Modifier) {
         }
         // Pantalla de Usuario: al continuar, navega a la pantalla de Pruebas
         composable<UserScreenRoute> {
-            UserScreen {
-                navController.navigate(PruebasScreenRoute)
+            UserScreen { edad ->
+                edadUsuario = edad //Guardo la edad
+                navController.navigate(PruebasScreenRoute(edadUsuario)) //Navegamos pasadno la edad
             }
         }
         // Pantalla de Pruebas: mas adelante la utilizmaos
-        composable<PruebasScreenRoute> {
-            PruebasScreen { pruebaId ->
-                // De momento regreso a la pantalla anterior:
-                navController.popBackStack()
-            }
+        composable<PruebasScreenRoute> { backStackEntry ->
+            PruebasScreen(
+                pruebaSelected = {navController.popBackStack() },
+                edadUsuario= edadUsuario  // Pasamos la edad
+            )
         }
     }
 }

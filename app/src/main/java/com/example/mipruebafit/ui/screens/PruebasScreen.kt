@@ -10,19 +10,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PruebasScreen(pruebaSelected: (String) -> Unit) {
+fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
     // Lista de pruebas que se mostraran en la pantalla depende de la edad
-    val pruebas = listOf("Abdominales ", "Flexibilidad ", "Test de Cooper ", "Velocidad", "Lanzamiento Balón")
+    val pruebas = obtenerPruebasPorEdad(edadUsuario)
 
     // Organizmao de manera vertical
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
 
         Spacer(modifier = Modifier.height(50.dp))
 
-        Text(text = "Lista de Pruebas", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = "Lista de Pruebas para esta edad $edadUsuario",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -42,5 +47,29 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit) {
                 }
             }
         }
+    }
+}
+
+// Para determinar que pruebas mostrar segun la edad del excel <=12 , 13, 14, 15, >=16
+fun obtenerPruebasPorEdad(edad: Int): List<String> {
+    return when {
+        edad <= 12 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper")
+        edad == 13 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper")
+        edad == 14 -> listOf("Abdominales", "Flexibilidad", "Test de Cooper", "Velocidad")
+        edad == 15 -> listOf(
+            "Abdominales",
+            "Flexibilidad",
+            "Test de Cooper",
+            "Velocidad",
+            "Lanzamiento Balón"
+        )
+
+        else -> listOf(
+            "Abdominales",
+            "Flexibilidad",
+            "Test de Cooper",
+            "Velocidad",
+            "Lanzamiento Balón"
+        ) // Para 16 o más
     }
 }
