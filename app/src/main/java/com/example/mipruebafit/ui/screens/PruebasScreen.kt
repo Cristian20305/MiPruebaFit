@@ -13,12 +13,15 @@ import androidx.compose.ui.unit.dp
 fun PruebasScreen(pruebaSelected: (String) -> Unit) {
 
     // Lista de pruebas que se mostraran en la pantalla depende de la edad
-    val pruebas = listOf("Abdominales ", "Flexibilidad ", "Test de Cooper ")
+    val pruebas = listOf("Abdominales ", "Flexibilidad ", "Test de Cooper ", "Velocidad", "Lanzamiento Balón")
 
     // Organizmao de manera vertical
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
+
+        Spacer(modifier = Modifier.height(50.dp))
+
         Text(text = "Lista de Pruebas", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))

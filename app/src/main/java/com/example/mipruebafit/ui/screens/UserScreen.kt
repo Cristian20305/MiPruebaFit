@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
+//Pantalla de usuario para ingresar los datos de esa persona como edas, poeso, altura y genero.
+//Tambien calculamos el IMC en un dialog
 @Composable
 fun UserScreen(function: () -> Unit) {
 
