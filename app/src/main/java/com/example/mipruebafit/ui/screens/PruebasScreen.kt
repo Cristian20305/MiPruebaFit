@@ -22,10 +22,14 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
     // Estado para el texto del buscador
     var searchView by rememberSaveable { mutableStateOf("") }
+
     // Lista de las pruebas filtradas por el texto
     val pruebasFiltradas = rememberSaveable(searchView) {
         pruebas.filter { it.nombre.contains(searchView, ignoreCase = true) }
     }
+
+    // Agrupamos por categorias
+    val pruebasAgrupadasCategoria = pruebasFiltradas.groupBy { it.categoriaPrueba }
 
     // Organizmao de manera vertical
     Column(
@@ -56,10 +60,24 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
-            // Iteramos sobre cada uno para que nos lo muestre desde una lista
-            items(pruebasFiltradas) { prueba ->
-                PruebaItem(prueba, pruebaSelected)
+
+            pruebasAgrupadasCategoria.forEach { (categoria, pruebas) ->
+                item {
+                    // Cada item que vaya mostrando su categoria en un texto y cuando buscamos en el buscador siguen apareciendo encima de cada card view
+                    Text(
+                        text = categoria.name.replace("_",""), // Reemplazo las que tengo con barra baja por nada
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
+                // Iteramos sobre cada uno para que nos lo muestre desde una lista
+                items(pruebas) { prueba ->
+                    PruebaItem(prueba, { pruebaSelected(prueba.nombre) })
+                }
             }
+
+
         }
     }
 }
