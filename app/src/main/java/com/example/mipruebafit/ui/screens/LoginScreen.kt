@@ -7,18 +7,32 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.mipruebafit.Data.repository.UserPreferences
 
 //Pantalla de login que nos lleva a la siguiente pantalla que es UserScreen tras inicar sesion
 
 @Composable
-fun LoginScreen(loginSuccess: () -> Unit) {
+fun LoginScreen(loginSuccess: () -> Unit, onForgotPassword: () -> Unit) {
+
+    // Coger el contesto actual para acceder al dataStore
+    val context = LocalContext.current
+    // En una instancia manejamos la contraseña UserPreferences
+    val userPreferences = remember { UserPreferences(context) }
 
     //Variables de estado para almacenar el nombre de usuario y contraseña
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var savedPassword by rememberSaveable { mutableStateOf("") }
+    var message by rememberSaveable { mutableStateOf("") }
+
+
+    LaunchedEffect(Unit) {
+        userPreferences.password.collect { savedPassword = it }
+    }
 
     //Layout principal en forma de columna
     Column(
@@ -53,11 +67,31 @@ fun LoginScreen(loginSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Boton de olvidar contraseña que nos lleva a otra actividad para cambiarla y compara la contraseña que ponemos con la guardada
         Button(
-            onClick = { loginSuccess() },
+            onClick = {
+                if (password == savedPassword) {
+                    loginSuccess()
+                } else {
+                    message = "Contraseña incorrecta"
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Ingresar")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextButton(onClick = { onForgotPassword() }) {
+            Text("¿Olvidaste tu contraseña?")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (message.isNotEmpty()) {
+            Text(text = message, color = MaterialTheme.colorScheme.error)
+        }
     }
+
 }

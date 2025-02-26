@@ -55,6 +55,7 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.serialization.json)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

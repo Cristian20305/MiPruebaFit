@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mipruebafit.ui.screens.ChangePasswordScreen
 import com.example.mipruebafit.ui.screens.LoginScreen
 import com.example.mipruebafit.ui.screens.UserScreen
 import com.example.mipruebafit.ui.screens.PruebasScreen
@@ -27,10 +28,12 @@ fun NavigationWrapper(modifier: Modifier) {
         startDestination = LoginScreenRoute
     ) {
         // Pantalla de Login: al presionar Ingresar navega a la pantalla de Usuario
+        // Añadimos que cuando le damos en olvidar contraseña, nos lleve a una pantalla para cambiar la contraseña
         composable<LoginScreenRoute> {
-            LoginScreen {
-                navController.navigate(UserScreenRoute)
-            }
+            LoginScreen(
+                loginSuccess = { navController.navigate(UserScreenRoute) },
+                onForgotPassword = { navController.navigate(ChangePasswordScreenRoute) }
+            )
         }
         // Pantalla de Usuario: al continuar, navega a la pantalla de Pruebas
         composable<UserScreenRoute> {
@@ -42,9 +45,13 @@ fun NavigationWrapper(modifier: Modifier) {
         // Pantalla de Pruebas: mas adelante la utilizmaos
         composable<PruebasScreenRoute> { backStackEntry ->
             PruebasScreen(
-                pruebaSelected = {navController.popBackStack() },
-                edadUsuario= edadUsuario  // Pasamos la edad
+                pruebaSelected = { navController.popBackStack() },
+                edadUsuario = edadUsuario  // Pasamos la edad
             )
+        }
+        // Pantalla de Olvida contraseña: nos vuelve a la actividad de antes al cambiar la contraseña
+        composable<ChangePasswordScreenRoute> {
+            ChangePasswordScreen { navController.popBackStack() }
         }
     }
 }
