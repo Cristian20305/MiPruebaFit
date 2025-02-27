@@ -24,14 +24,24 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
     var searchView by rememberSaveable { mutableStateOf("") }
 
     // Lista de las pruebas filtradas por el texto
-    val pruebasFiltradas = rememberSaveable(searchView) {
-        pruebas.filter { it.nombre.contains(searchView, ignoreCase = true) }
+    val pruebasFiltradas = remember {
+        derivedStateOf {
+            pruebas.filter {
+                it.nombre.contains(
+                    searchView,
+                    ignoreCase = true
+                )
+            }
+        }
     }
 
     // Agrupamos por categorias
-    val pruebasAgrupadasCategoria = pruebasFiltradas.groupBy { it.categoriaPrueba }
+    val pruebasAgrupadasCategoria = pruebasFiltradas.value.groupBy { it.categoriaPrueba }
 
-    // Organizmao de manera vertical
+    // Estado para la categoria seleccionada en el dropdown
+    var categoriaSeleccionada by rememberSaveable { mutableStateOf<String?>(null) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,7 +53,6 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
         // BUSCADOR
         OutlinedTextField(
             value = searchView,
-            // Se actualiza el texto del buscador
             onValueChange = { searchView = it },
             label = { Text("Buscar pruebas") },
             singleLine = true,
@@ -59,26 +68,53 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn {
-
-            pruebasAgrupadasCategoria.forEach { (categoria, pruebas) ->
-                item {
-                    // Cada item que vaya mostrando su categoria en un texto y cuando buscamos en el buscador siguen apareciendo encima de cada card view
-                    Text(
-                        text = categoria.name.replace("_",""), // Reemplazo las que tengo con barra baja por nada
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
-
-                // Iteramos sobre cada uno para que nos lo muestre desde una lista
-                items(pruebas) { prueba ->
-                    PruebaItem(prueba, { pruebaSelected(prueba.nombre) })
-                }
+        // Dropdown para filtrar por CATEGORIA
+        Box {
+            Button(onClick = { expanded = true }) {
+                Text(text = categoriaSeleccionada ?: "Selecciona una categoría")
             }
 
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropdownMenuItem(
+                    text = { Text("Todas") },
+                    onClick = {
+                        categoriaSeleccionada = null
+                        expanded = false
+                    }
+                )
+                pruebasAgrupadasCategoria.keys.forEach { categoria ->
+                    DropdownMenuItem(
+                        text = { Text(categoria.name.replace("_", "")) },
+                        onClick = {
+                            categoriaSeleccionada = categoria.name
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Mostramos las pruebas agrupadas por categoría
+        LazyColumn {
+            pruebasAgrupadasCategoria.forEach { (categoria, pruebas) ->
+                if (categoriaSeleccionada == null || categoria.name == categoriaSeleccionada) {
+                    item {
+                        // Mostramos la categoría encima de las pruebas
+                        Text(
+                            text = categoria.name.replace("_", ""),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+
+                    // Iteramos sobre cada prueba de la categoría seleccionada y la mostramos
+                    items(pruebas) { prueba ->
+                        PruebaItem(prueba, { pruebaSelected(prueba.nombre) })
+                    }
+                }
+            }
         }
     }
 }
-
