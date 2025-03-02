@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mipruebafit.ui.screens.NotasPruebas
 import com.example.mipruebafit.ui.screens.ChangePasswordScreen
 import com.example.mipruebafit.ui.screens.LoginScreen
 import com.example.mipruebafit.ui.screens.UserScreen
@@ -20,15 +21,9 @@ fun NavigationWrapper(modifier: Modifier) {
     // Objeto que controla la navegación
     val navController = rememberNavController()
     var edadUsuario by rememberSaveable { mutableStateOf(0) }
+    var generoUsuario by rememberSaveable { mutableStateOf("Masculino") }
 
-
-    // NavHost con la ruta de inicio definida como LoginScreenRoute
-    NavHost(
-        navController = navController,
-        startDestination = LoginScreenRoute
-    ) {
-        // Pantalla de Login: al presionar Ingresar navega a la pantalla de Usuario
-        // Añadimos que cuando le damos en olvidar contraseña, nos lleve a una pantalla para cambiar la contraseña
+    NavHost(navController = navController, startDestination = LoginScreenRoute) {
         composable<LoginScreenRoute> {
             LoginScreen(
                 loginSuccess = { navController.navigate(UserScreenRoute) },
@@ -42,14 +37,32 @@ fun NavigationWrapper(modifier: Modifier) {
                 navController.navigate(PruebasScreenRoute(edadUsuario)) //Navegamos pasadno la edad
             }
         }
-        // Pantalla de Pruebas: mas adelante la utilizmaos
-        composable<PruebasScreenRoute> { backStackEntry ->
+
+        // Pantalla de pruebas
+        composable<PruebasScreenRoute> {
             PruebasScreen(
-                pruebaSelected = { navController.popBackStack() },
-                edadUsuario = edadUsuario  // Pasamos la edad
+                pruebaSelected = { nombrePrueba ->
+                    navController.navigate(NotasScreenRoute(edadUsuario, generoUsuario,
+                        nombrePrueba.nombrePrueba
+                    ))
+                },
+                edadUsuario = edadUsuario
             )
         }
-        // Pantalla de Olvida contraseña: nos vuelve a la actividad de antes al cambiar la contraseña
+        //Pantalla de notas pasando los argumentos necesarios para calcular esa nota
+        composable<NotasScreenRoute> { backStackEntry ->
+            val args = backStackEntry.arguments
+            val edad = args?.getInt("edadUsuario") ?: 0
+            val genero = args?.getString("generoUsuario") ?: "Masculino"
+            val nombrePrueba = args?.getString("nombrePrueba") ?: "Abdominales"
+
+            NotasPruebas(
+                edad = edad,
+                generoUsuario = genero,
+                nombrePrueba = nombrePrueba
+            )
+        }
+        // Navegacion para cambiar la contraseña
         composable<ChangePasswordScreenRoute> {
             ChangePasswordScreen { navController.popBackStack() }
         }

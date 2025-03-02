@@ -23,20 +23,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mipruebafit.Data.model.Prueba
+import com.example.mipruebafit.Navigation.NotasScreenRoute
 
 
 //Mostramos una Card para que quede bonito con la informacion de la pruebas fisicas de PruebasRepository
 //@prueba Objeto de contiene nel nombre, imagen, enlace
 //@pruebaSelected funcion que se ejecuta cuando hacemos click en una tarjeta
 @Composable
-fun PruebaItem(prueba: Prueba, pruebaSelected: (String) -> Unit) {
+fun PruebaItem(prueba: Prueba, edadUsuario: Int, generoUsuario: String, pruebaSelected: (NotasScreenRoute) -> Unit) {
     val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
-            .clickable { pruebaSelected(prueba.nombre) }, // Cuando selecionamos la tarjeta, ejecutamis pruebaSelected
+            .clickable { pruebaSelected(NotasScreenRoute(edadUsuario, generoUsuario, prueba.nombre)) }, // Cuando selecionamos la tarjeta, ejecutamis pruebaSelected
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(modifier = Modifier.padding(20.dp)) {

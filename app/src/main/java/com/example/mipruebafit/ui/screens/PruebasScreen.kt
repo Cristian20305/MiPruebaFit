@@ -11,13 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.mipruebafit.Data.model.Prueba
 import com.example.mipruebafit.Data.repository.PruebasRepository
-import com.example.mipruebafit.R
 import com.example.mipruebafit.ui.components.PruebaItem
+import com.example.mipruebafit.Navigation.NotasScreenRoute
 
 @Composable
-fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
-
-    // Lista de pruebas que se mostraran en la pantalla depende de la edad
+fun PruebasScreen(pruebaSelected: (NotasScreenRoute) -> Unit, edadUsuario: Int) {
     val pruebas = PruebasRepository.obtenerPruebasPorEdad(edadUsuario)
 
     // Estado para el texto del buscador
@@ -27,10 +25,7 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
     val pruebasFiltradas = remember {
         derivedStateOf {
             pruebas.filter {
-                it.nombre.contains(
-                    searchView,
-                    ignoreCase = true
-                )
+                it.nombre.contains(searchView, ignoreCase = true)
             }
         }
     }
@@ -61,10 +56,7 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(
-            text = "Lista de Pruebas para esta edad $edadUsuario años",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        Text(text = "Lista de Pruebas para esta edad $edadUsuario años", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -111,7 +103,12 @@ fun PruebasScreen(pruebaSelected: (String) -> Unit, edadUsuario: Int) {
 
                     // Iteramos sobre cada prueba de la categoría seleccionada y la mostramos
                     items(pruebas) { prueba ->
-                        PruebaItem(prueba, { pruebaSelected(prueba.nombre) })
+                        PruebaItem(
+                            prueba = prueba,
+                            edadUsuario = edadUsuario,
+                            generoUsuario = "Masculino",
+                            pruebaSelected = { pruebaSelected(NotasScreenRoute(edadUsuario, "Masculino", prueba.nombre)) }
+                        )
                     }
                 }
             }
